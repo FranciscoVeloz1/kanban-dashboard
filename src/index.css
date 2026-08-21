@@ -107,6 +107,7 @@ textarea {
   border-radius: var(--radius-md);
   background-color: var(--surface-raised);
   color: var(--text-primary);
+  font-size: var(--text-body);
 }
 
 .control::placeholder {

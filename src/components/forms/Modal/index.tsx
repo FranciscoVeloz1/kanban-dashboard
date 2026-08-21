@@ -10,6 +10,8 @@ type ModalProps = {
   footer?: ReactNode;
 };
 
+let openDialogCount = 0;
+
 export function Modal({ open, title, onClose, busy = false, children, footer }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -31,6 +33,22 @@ export function Modal({ open, title, onClose, busy = false, children, footer }: 
     return () => {
       if (element.open) {
         element.close();
+      }
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    openDialogCount += 1;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      openDialogCount -= 1;
+      if (openDialogCount === 0) {
+        document.body.style.overflow = '';
       }
     };
   }, [open]);
