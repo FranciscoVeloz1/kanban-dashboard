@@ -1,0 +1,62 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+  box-shadow: var(--elevation-raised);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.title {
+  min-height: var(--hit-area-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 600;
+  text-align: left;
+  cursor: grab;
+}
+
+.tag {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 0.15rem 0.55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body {
+  margin: 0;
+  font-size: var(--text-label);
+  line-height: var(--leading-label);
+  color: var(--text-secondary);
+}
+
+.deadline,
+.deadlineOverdue,
+.checklist {
+  font-size: var(--text-label);
+  color: var(--text-secondary);
+}
+
+.deadlineOverdue {
+  color: var(--semantic-danger);
+  font-weight: 600;
+}

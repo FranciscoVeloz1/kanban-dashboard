@@ -31,4 +31,4 @@ export class ApiError extends Error {
   }
 }
 
-export const NETWORK_ERROR_MESSAGE = 'No se pudo conectar con el servidor';
+export const NETWORK_ERROR_MESSAGE = 'Could not reach the server';

@@ -1,75 +1,34 @@
-# React + TypeScript + Vite
+# Kanban dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal three-column board. Calm desk: index cards on warm paper.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Copy `.env.example` to `.env`. `VITE_API_BASE_URL` is the API **origin only** (`http://localhost:3000`), not `/api/v1`.
 
-## React Compiler
+Vite prints the SPA origin (usually `http://localhost:5173`). That origin must be in `personal-api` `CORS_ORIGINS`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Refresh token lives in `sessionStorage` under `kanban:refresh:v1`. Access token stays in memory.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Accounts are provisioned; there is no public signup.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Deployment (GitHub Pages)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+A push to `main` runs `.github/workflows/deploy.yml` (lint, typecheck, test,
+build) and deploys `dist/` to Pages at
+`https://franciscoveloz1.github.io/kanban-dashboard/`.
 
+Local `npm run dev` stays at `/`. The Pages `base` (`/kanban-dashboard/`) is set
+only in CI via `VITE_BASE_PATH`. Production API origin is the
+`VITE_API_BASE_URL` repository secret (no trailing slash).
+
+```bash
+gh secret set VITE_API_BASE_URL --body "https://YOUR-API.up.railway.app"
 ```
+
+On `personal-api`, include `https://franciscoveloz1.github.io` in `CORS_ORIGINS`.
