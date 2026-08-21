@@ -6,7 +6,7 @@ import './index.css';
 const container = document.getElementById('root');
 
 if (container === null) {
-  throw new Error('No se encontró el nodo raíz de la aplicación.');
+  throw new Error('Root node not found.');
 }
 
 createRoot(container).render(

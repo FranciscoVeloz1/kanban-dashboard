@@ -1,3 +1,4 @@
+import { getApiOrigin } from './config';
 import { ApiError, NETWORK_ERROR_MESSAGE, type ApiErrorBody } from './types';
 
 export type HttpRequestInit = Omit<RequestInit, 'headers'> & {
@@ -10,11 +11,6 @@ export interface HttpClientDeps {
   getAccessToken: () => string | null;
   refreshSession: () => Promise<string>;
   onSessionExpired: () => void;
-}
-
-function apiOrigin(): string {
-  const origin = import.meta.env.VITE_API_BASE_URL;
-  return typeof origin === 'string' ? origin.replace(/\/$/, '') : '';
 }
 
 async function parseBody<T>(res: Response): Promise<T> {
@@ -61,7 +57,7 @@ export function createHttpClient(deps: HttpClientDeps) {
 
     let res: Response;
     try {
-      res = await fetch(`${apiOrigin()}${path}`, { ...rest, headers });
+      res = await fetch(`${getApiOrigin()}${path}`, { ...rest, headers });
     } catch {
       throw new ApiError(0, { error: 'NETWORK_ERROR', message: NETWORK_ERROR_MESSAGE });
     }

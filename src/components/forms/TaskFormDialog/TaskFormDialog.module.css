@@ -1,0 +1,80 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.field,
+.itemLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  color: var(--text-secondary);
+  font-size: var(--text-label);
+}
+
+.itemLabel {
+  flex: 1;
+}
+
+.error {
+  margin: 0;
+  color: var(--semantic-danger);
+  font-size: var(--text-label);
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-label);
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.primary,
+.secondary,
+.danger {
+  min-height: var(--hit-area-min);
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.primary {
+  border: 0;
+  background-color: var(--accent-primary);
+  color: var(--text-inverse);
+}
+
+.secondary {
+  border: 1px solid var(--border-subtle);
+  background-color: transparent;
+}
+
+.danger {
+  margin-right: auto;
+  border: 0;
+  background-color: var(--semantic-danger);
+  color: var(--text-inverse);
+}
+
+.primary:disabled,
+.secondary:disabled,
+.danger:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
