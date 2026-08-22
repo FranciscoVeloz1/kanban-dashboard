@@ -1,4 +1,4 @@
-import { Modal } from '../Modal';
+import { useId } from 'react';
 import styles from './ConfirmDialog.module.css';
 
 type ConfirmDialogProps = {
@@ -20,24 +20,26 @@ export function ConfirmDialog({
   onCancel,
   busy = false,
 }: ConfirmDialogProps) {
+  const titleId = useId();
+
+  if (!open) {
+    return null;
+  }
+
   return (
-    <Modal
-      open={open}
-      title={title}
-      onClose={onCancel}
-      busy={busy}
-      footer={
-        <>
-          <button type="button" className={styles.cancel} onClick={onCancel} disabled={busy}>
-            Cancel
-          </button>
-          <button type="button" className={styles.confirm} onClick={onConfirm} disabled={busy}>
-            {confirmLabel}
-          </button>
-        </>
-      }
-    >
+    <section className={styles.box} aria-labelledby={titleId}>
+      <h2 id={titleId} className={styles.title}>
+        {title}
+      </h2>
       <p>{message}</p>
-    </Modal>
+      <div className={styles.actions}>
+        <button type="button" className={styles.cancel} onClick={onCancel} disabled={busy}>
+          Cancel
+        </button>
+        <button type="button" className={styles.confirm} onClick={onConfirm} disabled={busy}>
+          {confirmLabel}
+        </button>
+      </div>
+    </section>
   );
 }

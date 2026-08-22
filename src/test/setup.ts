@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest';
+import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 
 if (typeof HTMLDialogElement !== 'undefined') {
@@ -17,6 +18,7 @@ if (typeof HTMLDialogElement !== 'undefined') {
 }
 
 afterEach(() => {
+  cleanup();
   document.querySelectorAll('dialog').forEach((node) => {
     if (node instanceof HTMLDialogElement && node.open) {
       node.close();

@@ -13,15 +13,19 @@
 
 .action,
 .actionPrimary {
+  display: inline-flex;
+  align-items: center;
   min-height: var(--hit-area-min);
   padding: 0 var(--space-md);
   border-radius: var(--radius-md);
+  text-decoration: none;
   cursor: pointer;
 }
 
 .action {
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-raised);
+  color: var(--text-primary);
 }
 
 .actionPrimary {

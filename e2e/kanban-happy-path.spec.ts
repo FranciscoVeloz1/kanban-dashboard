@@ -58,21 +58,24 @@ test.describe('kanban happy path', () => {
 
     await loginUi(page, userA.email, userA.password);
 
-    await page.getByRole('button', { name: /add tag/i }).click();
-    await page.getByRole('dialog', { name: /add tag/i }).getByLabel(/name/i).fill('Work');
+    await page.getByRole('link', { name: /add tag/i }).click();
+    await expect(page).toHaveURL(/tags\/new/);
+    await page.getByRole('heading', { name: /add tag/i }).waitFor();
+    await page.getByLabel(/name/i).fill('Work');
     await page.getByRole('button', { name: /save|create/i }).click();
-    await expect(page.getByRole('dialog', { name: /add tag/i })).toHaveCount(0);
+    await expect(page).toHaveURL(/\/$/);
 
-    await page.getByRole('button', { name: /add task/i }).click();
-    const taskDialog = page.getByRole('dialog', { name: /add task|new task/i });
-    await taskDialog.getByLabel(/title/i).fill('Write specs');
-    await taskDialog.getByLabel(/description/i).fill('Kanban catalog');
-    await taskDialog.getByLabel(/tag/i).selectOption({ label: 'Work' });
-    await taskDialog.getByLabel(/deadline/i).fill('2026-08-25');
-    await taskDialog.getByRole('button', { name: /add item|add checklist/i }).click();
-    await taskDialog.getByLabel(/item/i).first().fill('Draft README');
-    await taskDialog.getByRole('button', { name: /save|create/i }).click();
-    await expect(taskDialog).toHaveCount(0);
+    await page.getByRole('link', { name: /add task/i }).click();
+    await expect(page).toHaveURL(/tasks\/new/);
+    await page.getByRole('heading', { name: /add task/i }).waitFor();
+    await page.getByLabel(/title/i).fill('Write specs');
+    await page.getByLabel(/description/i).fill('Kanban catalog');
+    await page.getByLabel(/tag/i).selectOption({ label: 'Work' });
+    await page.getByLabel(/deadline/i).fill('2026-08-25');
+    await page.getByRole('button', { name: /add item|add checklist/i }).click();
+    await page.getByLabel(/item/i).first().fill('Draft README');
+    await page.getByRole('button', { name: /save|create/i }).click();
+    await expect(page).toHaveURL(/\/$/);
 
     const pending = page.getByRole('region', { name: /pending/i });
     const pendingCard = pending.getByRole('group', { name: /write specs/i });
@@ -115,15 +118,19 @@ test.describe('kanban happy path', () => {
     await bContext.close();
 
     await page.getByRole('region', { name: /finished/i }).getByRole('button', { name: /write specs/i }).click();
-    const editDialog = page.getByRole('dialog', { name: /edit task/i });
-    await editDialog.getByLabel(/title/i).fill('Write specs v2');
-    await editDialog.getByRole('checkbox').first().check();
-    await editDialog.getByRole('button', { name: /save/i }).click();
+    await expect(page).toHaveURL(/tasks\//);
+    await page.getByRole('heading', { name: /edit task/i }).waitFor();
+    await page.getByLabel(/title/i).fill('Write specs v2');
+    await page.getByRole('checkbox').first().check();
+    await page.getByRole('button', { name: /save/i }).click();
+    await expect(page).toHaveURL(/\/$/);
     await expect(page.getByRole('group', { name: /write specs v2/i })).toBeVisible();
 
     await page.getByRole('group', { name: /write specs v2/i }).getByRole('button', { name: /write specs v2/i }).click();
-    await page.getByRole('dialog', { name: /edit task/i }).getByRole('button', { name: /delete/i }).click();
-    await page.getByRole('dialog', { name: /confirm/i }).getByRole('button', { name: /delete|confirm/i }).click();
+    await expect(page).toHaveURL(/tasks\//);
+    await page.getByRole('button', { name: /delete/i }).click();
+    await page.getByRole('region', { name: /confirm/i }).getByRole('button', { name: /delete|confirm/i }).click();
+    await expect(page).toHaveURL(/\/$/);
     await expect(page.getByText('Write specs v2')).toHaveCount(0);
   });
 });

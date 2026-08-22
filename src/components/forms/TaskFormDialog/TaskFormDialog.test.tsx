@@ -19,15 +19,7 @@ describe('TaskFormDialog', () => {
   it('does not submit create when title is empty', () => {
     const onSubmit = vi.fn();
 
-    render(
-      <TaskFormDialog
-        open
-        mode="create"
-        tags={[]}
-        onClose={vi.fn()}
-        onSubmit={onSubmit}
-      />,
-    );
+    render(<TaskFormDialog mode="create" tags={[]} onClose={vi.fn()} onSubmit={onSubmit} />);
 
     fireEvent.change(screen.getByLabelText(/^description$/i), {
       target: { value: 'Kanban catalog' },
@@ -41,7 +33,6 @@ describe('TaskFormDialog', () => {
   it('lists owner tags in the select', () => {
     render(
       <TaskFormDialog
-        open
         mode="create"
         tags={[{ id: 'tag-1', name: 'Work' }]}
         onClose={vi.fn()}
@@ -57,7 +48,6 @@ describe('TaskFormDialog', () => {
 
     render(
       <TaskFormDialog
-        open
         mode="edit"
         task={existing}
         tags={[{ id: 'tag-1', name: 'Work' }]}
@@ -82,11 +72,11 @@ describe('TaskFormDialog', () => {
     });
   });
 
-  it('clears create fields after cancel and after save', () => {
+  it('clears create fields after cancel and after a new mount', () => {
     const onClose = vi.fn();
     const onSubmit = vi.fn();
-    const { rerender } = render(
-      <TaskFormDialog open mode="create" tags={[]} onClose={onClose} onSubmit={onSubmit} />,
+    const { unmount } = render(
+      <TaskFormDialog mode="create" tags={[]} onClose={onClose} onSubmit={onSubmit} />,
     );
 
     fireEvent.change(screen.getByLabelText(/^title$/i), { target: { value: 'Leftover' } });
@@ -95,31 +85,19 @@ describe('TaskFormDialog', () => {
     fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }));
     expect(onClose).toHaveBeenCalled();
 
-    rerender(
-      <TaskFormDialog open={false} mode="create" tags={[]} onClose={onClose} onSubmit={onSubmit} />,
-    );
-    rerender(
-      <TaskFormDialog open mode="create" tags={[]} onClose={onClose} onSubmit={onSubmit} />,
-    );
+    unmount();
+    render(<TaskFormDialog mode="create" tags={[]} onClose={onClose} onSubmit={onSubmit} />);
 
     expect(screen.getByLabelText(/^title$/i)).toHaveValue('');
     expect(screen.getByLabelText(/^description$/i)).toHaveValue('');
     expect(screen.queryByLabelText(/item 1/i)).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText(/^title$/i), { target: { value: 'Write specs' } });
-    fireEvent.change(screen.getByLabelText(/^description$/i), { target: { value: 'Kanban catalog' } });
+    fireEvent.change(screen.getByLabelText(/^description$/i), {
+      target: { value: 'Kanban catalog' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /^save$/i }));
     expect(onSubmit).toHaveBeenCalled();
-
-    rerender(
-      <TaskFormDialog open={false} mode="create" tags={[]} onClose={onClose} onSubmit={onSubmit} />,
-    );
-    rerender(
-      <TaskFormDialog open mode="create" tags={[]} onClose={onClose} onSubmit={onSubmit} />,
-    );
-
-    expect(screen.getByLabelText(/^title$/i)).toHaveValue('');
-    expect(screen.getByLabelText(/^description$/i)).toHaveValue('');
   });
 
   it('deletes only after confirm', () => {
@@ -127,7 +105,6 @@ describe('TaskFormDialog', () => {
 
     render(
       <TaskFormDialog
-        open
         mode="edit"
         task={existing}
         tags={[]}
@@ -140,12 +117,16 @@ describe('TaskFormDialog', () => {
     fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
     expect(onDelete).not.toHaveBeenCalled();
 
-    fireEvent.click(within(screen.getByRole('dialog', { name: /confirm/i })).getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(
+      within(screen.getByRole('region', { name: /confirm/i })).getByRole('button', { name: 'Cancel' }),
+    );
     expect(onDelete).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
     fireEvent.click(
-      within(screen.getByRole('dialog', { name: /confirm/i })).getByRole('button', { name: /^delete$/i }),
+      within(screen.getByRole('region', { name: /confirm/i })).getByRole('button', {
+        name: /^delete$/i,
+      }),
     );
     expect(onDelete).toHaveBeenCalledOnce();
   });

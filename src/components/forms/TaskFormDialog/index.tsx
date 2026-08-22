@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import type { KanbanTag, KanbanTask } from '../../../types/kanban';
 import { ConfirmDialog } from '../ConfirmDialog';
-import { Modal } from '../Modal';
 import styles from './TaskFormDialog.module.css';
 
 export type TaskFormValues = {
@@ -13,7 +12,6 @@ export type TaskFormValues = {
 };
 
 type TaskFormDialogProps = {
-  open: boolean;
   mode: 'create' | 'edit';
   tags: KanbanTag[];
   task?: KanbanTask;
@@ -40,13 +38,7 @@ function draftsFromTask(task: KanbanTask | undefined): ChecklistDraft[] {
   });
 }
 
-export function TaskFormDialog(props: TaskFormDialogProps) {
-  const instanceKey = props.open ? (props.task?.id ?? 'create') : 'closed';
-  return <TaskFormBody key={instanceKey} {...props} />;
-}
-
-function TaskFormBody({
-  open,
+export function TaskFormDialog({
   mode,
   tags,
   task,
@@ -109,226 +101,216 @@ function TaskFormBody({
     });
   };
 
-  return (
-    <>
-      <Modal
-        open={open}
-        title={mode === 'edit' ? 'Edit task' : 'Add task'}
-        onClose={onClose}
+  if (confirmOpen) {
+    return (
+      <ConfirmDialog
+        open
+        title="Confirm delete"
+        message="Delete this task? This cannot be undone."
+        confirmLabel="Delete"
         busy={busy}
-        footer={
-          <>
-            {mode === 'edit' && onDelete !== undefined ? (
-              <button
-                type="button"
-                className={styles.danger}
-                disabled={busy}
-                onClick={() => {
-                  setConfirmOpen(true);
-                }}
-              >
-                Delete
-              </button>
-            ) : null}
-            <button type="button" className={styles.secondary} onClick={onClose} disabled={busy}>
-              Cancel
-            </button>
-            <button type="submit" form="task-form" className={styles.primary} disabled={busy}>
-              {busy ? 'Saving…' : 'Save'}
-            </button>
-          </>
-        }
-      >
-        <form id="task-form" className={styles.form} onSubmit={handleSubmit} noValidate>
-          <label className={styles.field} htmlFor="task-title">
-            Title
-            <input
-              id="task-title"
-              className="control"
-              name="title"
-              value={title}
-              disabled={busy}
-              aria-invalid={titleError !== null}
-              onChange={(event) => {
-                setTitle(event.currentTarget.value);
-                setTitleError(null);
-              }}
-            />
-          </label>
-          {titleError === null ? null : (
-            <p className={styles.error} role="alert">
-              {titleError}
-            </p>
-          )}
+        onCancel={() => {
+          setConfirmOpen(false);
+        }}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          void onDelete?.();
+        }}
+      />
+    );
+  }
 
-          <label className={styles.field} htmlFor="task-description">
-            Description
-            <textarea
-              id="task-description"
-              className="control"
-              name="description"
-              value={description}
-              disabled={busy}
-              rows={4}
-              aria-invalid={descriptionError !== null}
-              onChange={(event) => {
-                setDescription(event.currentTarget.value);
-                setDescriptionError(null);
-              }}
-            />
-          </label>
-          {descriptionError === null ? null : (
-            <p className={styles.error} role="alert">
-              {descriptionError}
-            </p>
-          )}
-
-          <label className={styles.field} htmlFor="task-tag">
-            Tag
-            <select
-              id="task-tag"
-              className="control"
-              name="tag"
-              value={tagId}
-              disabled={busy}
-              onChange={(event) => {
-                setTagId(event.currentTarget.value);
-              }}
-            >
-              <option value="">None</option>
-              {tags.map((tag) => {
-                return (
-                  <option key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-
-          <label className={styles.field} htmlFor="task-deadline">
-            Deadline
-            <input
-              id="task-deadline"
-              className="control"
-              type="date"
-              name="deadline"
-              value={deadline}
-              disabled={busy}
-              onChange={(event) => {
-                setDeadline(event.currentTarget.value);
-              }}
-            />
-          </label>
-
-          <fieldset className={styles.checklist}>
-            <legend>Checklist</legend>
-            {checklist.length === 0 ? (
-              <p className={styles.hint}>No checklist items yet.</p>
-            ) : (
-              checklist.map((item, index) => {
-                return (
-                  <div key={item.id} className={styles.item}>
-                    <input
-                      type="checkbox"
-                      checked={item.done}
-                      disabled={busy}
-                      aria-label={`Done ${index + 1}`}
-                      onChange={(event) => {
-                        const done = event.currentTarget.checked;
-                        setChecklist((current) => {
-                          return current.map((entry) => {
-                            if (entry.id !== item.id) {
-                              return entry;
-                            }
-
-                            return { ...entry, done };
-                          });
-                        });
-                      }}
-                    />
-                    <label className={styles.itemLabel} htmlFor={`checklist-item-${item.id}`}>
-                      Item {index + 1}
-                      <input
-                        id={`checklist-item-${item.id}`}
-                        className="control"
-                        value={item.text}
-                        disabled={busy}
-                        onChange={(event) => {
-                          const text = event.currentTarget.value;
-                          setChecklistError(null);
-                          setChecklist((current) => {
-                            return current.map((entry) => {
-                              if (entry.id !== item.id) {
-                                return entry;
-                              }
-
-                              return { ...entry, text };
-                            });
-                          });
-                        }}
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className={styles.secondary}
-                      disabled={busy}
-                      aria-label={`Remove item ${index + 1}`}
-                      onClick={() => {
-                        setChecklist((current) => current.filter((entry) => entry.id !== item.id));
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                );
-              })
-            )}
-            {checklistError === null ? null : (
-              <p className={styles.error} role="alert">
-                {checklistError}
-              </p>
-            )}
-            <button
-              type="button"
-              className={styles.secondary}
-              disabled={busy}
-              onClick={() => {
-                setChecklist((current) => {
-                  return [
-                    ...current,
-                    { id: crypto.randomUUID(), text: '', done: false },
-                  ];
-                });
-              }}
-            >
-              Add item
-            </button>
-          </fieldset>
-
-          {error === null ? null : (
-            <p className={styles.error} role="alert">
-              {error}
-            </p>
-          )}
-        </form>
-      </Modal>
-
-      {confirmOpen ? (
-        <ConfirmDialog
-          open
-          title="Confirm delete"
-          message="Delete this task? This cannot be undone."
-          confirmLabel="Delete"
-          onCancel={() => {
-            setConfirmOpen(false);
-          }}
-          onConfirm={() => {
-            setConfirmOpen(false);
-            void onDelete?.();
+  return (
+    <form className={styles.form} onSubmit={handleSubmit} noValidate>
+      <label className={styles.field} htmlFor="task-title">
+        Title
+        <input
+          id="task-title"
+          className="control"
+          name="title"
+          value={title}
+          disabled={busy}
+          aria-invalid={titleError !== null}
+          onChange={(event) => {
+            setTitle(event.currentTarget.value);
+            setTitleError(null);
           }}
         />
-      ) : null}
-    </>
+      </label>
+      {titleError === null ? null : (
+        <p className={styles.error} role="alert">
+          {titleError}
+        </p>
+      )}
+
+      <label className={styles.field} htmlFor="task-description">
+        Description
+        <textarea
+          id="task-description"
+          className="control"
+          name="description"
+          value={description}
+          disabled={busy}
+          rows={4}
+          aria-invalid={descriptionError !== null}
+          onChange={(event) => {
+            setDescription(event.currentTarget.value);
+            setDescriptionError(null);
+          }}
+        />
+      </label>
+      {descriptionError === null ? null : (
+        <p className={styles.error} role="alert">
+          {descriptionError}
+        </p>
+      )}
+
+      <label className={styles.field} htmlFor="task-tag">
+        Tag
+        <select
+          id="task-tag"
+          className="control"
+          name="tag"
+          value={tagId}
+          disabled={busy}
+          onChange={(event) => {
+            setTagId(event.currentTarget.value);
+          }}
+        >
+          <option value="">None</option>
+          {tags.map((tag) => {
+            return (
+              <option key={tag.id} value={tag.id}>
+                {tag.name}
+              </option>
+            );
+          })}
+        </select>
+      </label>
+
+      <label className={styles.field} htmlFor="task-deadline">
+        Deadline
+        <input
+          id="task-deadline"
+          className="control"
+          type="date"
+          name="deadline"
+          value={deadline}
+          disabled={busy}
+          onChange={(event) => {
+            setDeadline(event.currentTarget.value);
+          }}
+        />
+      </label>
+
+      <fieldset className={styles.checklist}>
+        <legend>Checklist</legend>
+        {checklist.length === 0 ? (
+          <p className={styles.hint}>No checklist items yet.</p>
+        ) : (
+          checklist.map((item, index) => {
+            return (
+              <div key={item.id} className={styles.item}>
+                <input
+                  type="checkbox"
+                  checked={item.done}
+                  disabled={busy}
+                  aria-label={`Done ${index + 1}`}
+                  onChange={(event) => {
+                    const done = event.currentTarget.checked;
+                    setChecklist((current) => {
+                      return current.map((entry) => {
+                        if (entry.id !== item.id) {
+                          return entry;
+                        }
+
+                        return { ...entry, done };
+                      });
+                    });
+                  }}
+                />
+                <label className={styles.itemLabel} htmlFor={`checklist-item-${item.id}`}>
+                  Item {index + 1}
+                  <input
+                    id={`checklist-item-${item.id}`}
+                    className="control"
+                    value={item.text}
+                    disabled={busy}
+                    onChange={(event) => {
+                      const text = event.currentTarget.value;
+                      setChecklistError(null);
+                      setChecklist((current) => {
+                        return current.map((entry) => {
+                          if (entry.id !== item.id) {
+                            return entry;
+                          }
+
+                          return { ...entry, text };
+                        });
+                      });
+                    }}
+                  />
+                </label>
+                <button
+                  type="button"
+                  className={styles.secondary}
+                  disabled={busy}
+                  aria-label={`Remove item ${index + 1}`}
+                  onClick={() => {
+                    setChecklist((current) => current.filter((entry) => entry.id !== item.id));
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            );
+          })
+        )}
+        {checklistError === null ? null : (
+          <p className={styles.error} role="alert">
+            {checklistError}
+          </p>
+        )}
+        <button
+          type="button"
+          className={styles.secondary}
+          disabled={busy}
+          onClick={() => {
+            setChecklist((current) => {
+              return [...current, { id: crypto.randomUUID(), text: '', done: false }];
+            });
+          }}
+        >
+          Add item
+        </button>
+      </fieldset>
+
+      {error === null ? null : (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+
+      <div className={styles.actions}>
+        {mode === 'edit' && onDelete !== undefined ? (
+          <button
+            type="button"
+            className={styles.danger}
+            disabled={busy}
+            onClick={() => {
+              setConfirmOpen(true);
+            }}
+          >
+            Delete
+          </button>
+        ) : null}
+        <button type="button" className={styles.secondary} onClick={onClose} disabled={busy}>
+          Cancel
+        </button>
+        <button type="submit" className={styles.primary} disabled={busy}>
+          {busy ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+    </form>
   );
 }

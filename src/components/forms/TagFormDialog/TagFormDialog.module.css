@@ -38,6 +38,13 @@
   background-color: transparent;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
 .primary:disabled,
 .secondary:disabled {
   opacity: 0.7;

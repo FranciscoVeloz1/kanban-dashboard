@@ -6,6 +6,9 @@ import { RequireAuth } from './auth/RequireAuth';
 import { AppShell } from './components/layout/AppShell';
 import { BoardPage } from './pages/BoardPage';
 import { LoginPage } from './pages/LoginPage';
+import { TagCreatePage } from './pages/TagCreatePage';
+import { TaskCreatePage } from './pages/TaskCreatePage';
+import { TaskEditPage } from './pages/TaskEditPage';
 
 export function App() {
   return (
@@ -22,6 +25,9 @@ export function App() {
               }
             >
               <Route path="/" element={<BoardPage />} />
+              <Route path="/tags/new" element={<TagCreatePage />} />
+              <Route path="/tasks/new" element={<TaskCreatePage />} />
+              <Route path="/tasks/:taskId" element={<TaskEditPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
