@@ -8,7 +8,7 @@ Copy `.env.example` to `.env`. `VITE_API_BASE_URL` is the API **origin only** (`
 
 Vite prints the SPA origin (usually `http://localhost:5173`). That origin must be in `personal-api` `CORS_ORIGINS`.
 
-Refresh token lives in `sessionStorage` under `kanban:refresh:v1`. Access token stays in memory.
+Refresh token lives in `localStorage` under `kanban:refresh:v1`. Access token stays in memory.
 
 ```bash
 npm install

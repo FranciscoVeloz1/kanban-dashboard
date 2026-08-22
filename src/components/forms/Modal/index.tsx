@@ -22,15 +22,29 @@ export function Modal({ open, title, onClose, busy = false, children, footer }: 
       return;
     }
 
-    if (open && !element.open) {
-      element.showModal();
-    }
+    let frameOuter = 0;
+    let frameInner = 0;
 
-    if (!open && element.open) {
+    if (open) {
+      if (!element.open) {
+        element.showModal();
+      }
+
+      element.classList.remove(styles.entered);
+      frameOuter = requestAnimationFrame(() => {
+        frameInner = requestAnimationFrame(() => {
+          element.classList.add(styles.entered);
+        });
+      });
+    } else if (element.open) {
+      element.classList.remove(styles.entered);
       element.close();
     }
 
     return () => {
+      cancelAnimationFrame(frameOuter);
+      cancelAnimationFrame(frameInner);
+      element.classList.remove(styles.entered);
       if (element.open) {
         element.close();
       }
