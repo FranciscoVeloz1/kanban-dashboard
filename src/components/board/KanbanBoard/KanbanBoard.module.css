@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-md);
+  min-width: 0;
   min-height: calc(100dvh - var(--header-height) - (var(--space-lg) * 2));
 }
 
@@ -46,7 +47,10 @@
 
 @media (width < 768px) {
   .board {
-    grid-template-columns: 1fr;
-    min-height: 0;
+    grid-template-columns: repeat(3, 100%);
+    gap: var(--space-sm);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    min-height: calc(100dvh - var(--header-height) - (var(--space-sm) * 2));
   }
 }

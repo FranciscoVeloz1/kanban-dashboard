@@ -26,6 +26,7 @@
   font-size: var(--text-h3);
   font-weight: 600;
   text-align: left;
+  overflow-wrap: anywhere;
   cursor: grab;
 }
 
@@ -44,9 +45,17 @@
 
 .body {
   margin: 0;
+  overflow-wrap: anywhere;
   font-size: var(--text-label);
   line-height: var(--leading-label);
   color: var(--text-secondary);
+}
+
+@media (width < 768px) {
+  .card {
+    padding: var(--space-sm);
+    touch-action: pan-x pan-y;
+  }
 }
 
 .deadline,

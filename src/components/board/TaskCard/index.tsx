@@ -61,9 +61,6 @@ export function TaskCard({ task, onMove, onOpen, today }: TaskCardProps) {
       startY: event.clientY,
       active: false,
     };
-    if (typeof event.currentTarget.setPointerCapture === 'function') {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    }
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
@@ -77,7 +74,13 @@ export function TaskCard({ task, onMove, onOpen, today }: TaskCardProps) {
       return;
     }
 
-    drag.active = true;
+    if (!drag.active) {
+      drag.active = true;
+      if (typeof event.currentTarget.setPointerCapture === 'function') {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
+    }
+
     didDrag.current = true;
     event.preventDefault();
 
