@@ -11,6 +11,10 @@
   gap: var(--space-sm);
 }
 
+.filters {
+  flex-basis: 100%;
+}
+
 .action,
 .actionPrimary {
   display: inline-flex;
