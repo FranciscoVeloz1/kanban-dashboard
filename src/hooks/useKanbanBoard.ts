@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createTag,
   createTask,
@@ -19,12 +19,20 @@ type TasksCache = {
   tasks: KanbanTask[];
 };
 
-export function useKanbanBoard() {
+function tasksQueryKey(tagId?: string) {
+  return [...KANBAN_TASKS_KEY, tagId ?? 'all'] as const;
+}
+
+export function useKanbanBoard(tagId?: string) {
   const queryClient = useQueryClient();
+  const tasksKey = tasksQueryKey(tagId);
 
   const tasksQuery = useQuery({
-    queryKey: KANBAN_TASKS_KEY,
-    queryFn: listTasks,
+    queryKey: tasksKey,
+    queryFn: () => {
+      return listTasks(tagId);
+    },
+    placeholderData: keepPreviousData,
   });
 
   const tagsQuery = useQuery({
@@ -38,12 +46,12 @@ export function useKanbanBoard() {
     },
     onMutate: async ({ taskId, status }) => {
       await queryClient.cancelQueries({ queryKey: KANBAN_TASKS_KEY });
-      const previous = queryClient.getQueryData<TasksCache>(KANBAN_TASKS_KEY);
+      const previous = queryClient.getQueryData<TasksCache>(tasksKey);
       if (previous === undefined) {
         return { previous };
       }
 
-      queryClient.setQueryData<TasksCache>(KANBAN_TASKS_KEY, {
+      queryClient.setQueryData<TasksCache>(tasksKey, {
         tasks: previous.tasks.map((item) => {
           if (item.id !== taskId) {
             return item;
@@ -57,11 +65,11 @@ export function useKanbanBoard() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previous !== undefined) {
-        queryClient.setQueryData(KANBAN_TASKS_KEY, context.previous);
+        queryClient.setQueryData(tasksKey, context.previous);
       }
     },
     onSuccess: (data) => {
-      queryClient.setQueryData<TasksCache>(KANBAN_TASKS_KEY, (current) => {
+      queryClient.setQueryData<TasksCache>(tasksKey, (current) => {
         if (current === undefined) {
           return { tasks: [data.task] };
         }

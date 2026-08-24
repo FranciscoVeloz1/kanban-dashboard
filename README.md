@@ -1,5 +1,10 @@
 # Kanban dashboard
 
+## Status
+
+- **Stage:** production ready
+- **Audited:** 2026-08-23
+
 Personal three-column board. Calm desk: index cards on warm paper.
 
 ## Setup

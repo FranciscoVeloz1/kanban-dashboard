@@ -38,8 +38,9 @@ export type TaskResponse = {
   task: KanbanTask;
 };
 
-export function listTasks(): Promise<ListTasksResponse> {
-  return request<ListTasksResponse>('/api/v1/kanban/tasks');
+export function listTasks(tagId?: string): Promise<ListTasksResponse> {
+  const suffix = tagId === undefined ? '' : `?tagId=${encodeURIComponent(tagId)}`;
+  return request<ListTasksResponse>(`/api/v1/kanban/tasks${suffix}`);
 }
 
 export function listTags(): Promise<ListTagsResponse> {

@@ -119,4 +119,15 @@ describe('useKanbanBoard', () => {
       expect(result.current.grouped.FINISHED).toEqual([]);
     });
   });
+
+  it('passes tagId into listTasks', async () => {
+    vi.mocked(listTasks).mockResolvedValue({ tasks: [] });
+    vi.mocked(listTags).mockResolvedValue({ tags: [] });
+
+    renderHook(() => useKanbanBoard('tag-1'), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(listTasks).toHaveBeenCalledWith('tag-1');
+    });
+  });
 });
